@@ -12,6 +12,9 @@
     "@zubir2k"
   ],
   "config_flow": true,
+  "dependencies": [
+    "http"
+  ],
   "documentation": "https://github.com/zubir2k/homeassistant-paip",
   "integration_type": "hub",
   "iot_class": "cloud_polling",
