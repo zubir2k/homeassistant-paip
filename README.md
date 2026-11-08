@@ -65,7 +65,7 @@ Polling runs once a day. PAIP posts payments 1–3 days after you pay.
 ## Actions
 
 - `paip.refresh`: refresh now (all entries, or the one you pick).
-- `paip.generate_bill_pdf`: renders a bill as a PDF in the same layout as the PahangGo app and saves it to `/config/www/paip/bil_<account>_<bill>.pdf`, served at `/local/paip/...`. Give it `account_number`, plus `bill_number` (MMYYYY) for an older bill. It returns `path` and `url`.
+- `paip.generate_bill_pdf`: renders a bill as a PDF in the same layout as the PahangGo app and returns a private, time-limited link to it ([details](#bill-pdf)).
 
 ### Bill PDF
 
@@ -75,22 +75,32 @@ Polling runs once a day. PAIP posts payments 1–3 days after you pay.
 |---|---|---|
 | `account_number` | yes | A 10-digit account that is already added to the integration |
 | `bill_number` | no | `MMYYYY`, e.g. `102026`. Leave it out for the latest bill. |
+| `expires` | no | Hours the link works, 1–168. Default 24. |
 
 The response:
 
 ```yaml
-path: /config/www/paip/bil_0312345678_102026.pdf
-url: /local/paip/bil_0312345678_102026.pdf
+path: /config/paip_bills/bil_0123456789_102026.pdf
+url: /api/paip/bill/bil_0123456789_102026.pdf?authSig=eyJhbGciOi...
+external_url: https://your-ha.example.com/api/paip/bill/bil_0123456789_102026.pdf?authSig=eyJhbGciOi...
+expires_at: "2026-11-10T09:00:00+08:00"
 bill_number: "102026"
 ```
 
 Run it from **Developer tools → Actions** (tick *Return response*), or in an automation. See [example 1](#1-new-bill-pdf-to-your-phone).
 
+**Bills stay private.** PDFs are saved in `/config/paip_bills/`, which Home Assistant doesn't serve. They are not in `/config/www`, because `/local/` there is open to anyone. They can only be opened through `/api/paip/bill/...`, which needs either a signed-in Home Assistant user or the signed `authSig` link the action returns. That link:
+- opens straight from a notification tap in the Companion app, with no login prompt;
+- stops working after `expires` hours, or when Home Assistant restarts (run the action again for a fresh link);
+- only opens that one file.
+
+Use `url` in Companion app notifications. Use `external_url` (built from your external or Nabu Casa URL, or empty if none is set) for anything that opens outside the app, such as Telegram or email. Treat it like a password until it expires.
+
 Notes:
 - Only the **last six bills** are available, because that is all PAIP's data returns.
 - Running it again for the same bill overwrites the file.
 - The first run after a restart takes a second or two, because the PDF library loads on demand.
-- ⚠️ Files in `/config/www` are served at `/local/` **without signing in**. Anyone who can reach your Home Assistant and guesses the filename can open the bill, including your name and address. Keep these links inside your home network, or delete the PDFs after use.
+- Upgrading from an early test build? PDFs found in `/config/www/paip/` are moved to `/config/paip_bills/` on startup.
 - Errors: *account not configured* (add the account first) or *bill not found* (the bill number isn't among the last six).
 
 ## Payment link
@@ -119,7 +129,7 @@ triggers:
 actions:
   - action: paip.generate_bill_pdf
     data:
-      account_number: "0312345678"
+      account_number: "0123456789"
     response_variable: bill
   - action: notify.mobile_app_your_phone
     data:
@@ -260,18 +270,21 @@ cards:
     icon: mdi:cash-fast
     tap_action:
       action: url
-      url_path: https://myairpahang.paip.com.my/payment/check/0312345678
+      url_path: https://myairpahang.paip.com.my/payment/check/0123456789
 ```
 
 Button cards can't template a URL, so paste your account's link. You can copy it from the `payment_url` attribute in **Developer tools → States**. For usage history, add a **Statistics graph** card with `paip:<account>_water`, or use the Energy dashboard.
 
 ## Removing
 
-Go to Settings → Devices & services → PAIP → ⋮ → **Delete**. Then uninstall it from the Marketplace (or HACS). PDFs you generated stay in `/config/www/paip/` until you delete them.
+Go to Settings → Devices & services → PAIP → ⋮ → **Delete**. Then uninstall it from the Marketplace (or HACS). PDFs you generated stay in `/config/paip_bills/` until you delete them.
 
 ## Privacy
 
-The bill lookup is unauthenticated, so anyone with an account number can see the owner's name and address. Never post account numbers in public issues. Diagnostics downloads redact account numbers, names, addresses, meter and receipt numbers.
+- The bill lookup is unauthenticated, so anyone with an account number can see the owner's name and address. Never post account numbers in public issues or screenshots.
+- Inside Home Assistant, the owner's name and address appear only as attributes of the diagnostic **Account status** sensor, and in the bill PDFs.
+- Bill PDFs are never put in `/config/www` or `/local/`. They open only for a signed-in user or through an expiring signed link (see [Bill PDF](#bill-pdf)).
+- Diagnostics downloads redact account numbers, names, addresses, and meter and receipt numbers.
 
 ## Disclaimer
 
