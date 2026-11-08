@@ -1,4 +1,4 @@
-![Air Pahang](https://raw.githubusercontent.com/zubir2k/homeassistant-paip/main/images/banner.png)
+<img src="https://raw.githubusercontent.com/zubir2k/homeassistant-paip/main/images/banner.png" width="450">
 
 [![GitHub Repo stars](https://img.shields.io/github/stars/zubir2k/homeassistant-paip?style=social)](https://github.com/zubir2k/homeassistant-paip/stargazers)
 [![hacs_badge](https://img.shields.io/badge/HACS-Integration-41BDF5.svg)](https://github.com/hacs/integration)
@@ -276,3 +276,7 @@ The bill lookup is unauthenticated, so anyone with an account number can see the
 ## Disclaimer
 
 This is unofficial and not affiliated with PAIP or PahangGo. It uses undocumented endpoints that may change without notice.
+
+## Join us
+
+* Join the local community discussion at [Home Assistant Malaysia](https://www.facebook.com/groups/homeassistantmalaysia).
