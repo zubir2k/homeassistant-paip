@@ -1,0 +1,24 @@
+{
+  "entity": {
+    "sensor": {
+      "balance": {"default": "mdi:cash"},
+      "amount_due": {"default": "mdi:cash-clock"},
+      "latest_bill_amount": {"default": "mdi:receipt-text"},
+      "water_charge": {"default": "mdi:water-outline"},
+      "arrears": {"default": "mdi:cash-remove"},
+      "latest_bill_usage": {"default": "mdi:water"},
+      "average_monthly_usage": {"default": "mdi:chart-bar"},
+      "meter_reading": {"default": "mdi:counter"},
+      "bill_date": {"default": "mdi:calendar-text"},
+      "due_date": {"default": "mdi:calendar-alert"},
+      "last_payment_amount": {"default": "mdi:cash-check"},
+      "last_payment_date": {"default": "mdi:calendar-check"}
+    },
+    "binary_sensor": {"overdue": {"default": "mdi:water-alert"}},
+    "button": {"refresh": {"default": "mdi:refresh"}}
+  },
+  "services": {
+    "refresh": {"service": "mdi:refresh"},
+    "generate_bill_pdf": {"service": "mdi:file-pdf-box"}
+  }
+}

@@ -1,0 +1,150 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Add a PAIP water account",
+        "description": "Enter the 10-digit account number (No Akaun) from your PAIP bill. Add more accounts later by adding the integration again or from Configure.",
+        "data": {
+          "account_number": "Account number",
+          "nickname": "Nickname (optional)"
+        },
+        "data_description": {
+          "nickname": "Used for the device name, e.g. Rumah Temerloh. Defaults to the street address."
+        }
+      }
+    },
+    "error": {
+      "invalid_account": "PAIP account numbers are 10 digits.",
+      "account_not_found": "PAIP has no record for this account number.",
+      "already_added": "This account is already added.",
+      "cannot_connect": "Couldn't reach PahangGo. Try again later.",
+      "unknown": "Unexpected error."
+    },
+    "abort": {
+      "already_configured": "PAIP is already set up.",
+      "account_added": "Added {nickname} to your PAIP accounts."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "PAIP accounts",
+        "menu_options": {
+          "add_account": "Add an account",
+          "remove_accounts": "Remove accounts"
+        }
+      },
+      "add_account": {
+        "title": "Add a PAIP water account",
+        "data": {
+          "account_number": "Account number",
+          "nickname": "Nickname (optional)"
+        }
+      },
+      "remove_accounts": {
+        "title": "Remove accounts",
+        "data": {
+          "remove": "Accounts to remove"
+        }
+      }
+    },
+    "error": {
+      "invalid_account": "PAIP account numbers are 10 digits.",
+      "account_not_found": "PAIP has no record for this account number.",
+      "already_added": "This account is already added.",
+      "cannot_connect": "Couldn't reach PahangGo. Try again later.",
+      "unknown": "Unexpected error.",
+      "keep_one": "Keep at least one account, or delete the integration instead."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "balance": {
+        "name": "Balance"
+      },
+      "amount_due": {
+        "name": "Amount due"
+      },
+      "latest_bill_amount": {
+        "name": "Latest bill"
+      },
+      "water_charge": {
+        "name": "Water charge"
+      },
+      "arrears": {
+        "name": "Arrears"
+      },
+      "latest_bill_usage": {
+        "name": "Latest bill usage"
+      },
+      "average_monthly_usage": {
+        "name": "Average monthly usage"
+      },
+      "meter_reading": {
+        "name": "Meter reading"
+      },
+      "bill_date": {
+        "name": "Bill date"
+      },
+      "due_date": {
+        "name": "Due date"
+      },
+      "last_payment_amount": {
+        "name": "Last payment"
+      },
+      "last_payment_date": {
+        "name": "Last payment date"
+      },
+      "account_status": {
+        "name": "Account status"
+      }
+    },
+    "binary_sensor": {
+      "overdue": {
+        "name": "Overdue"
+      }
+    },
+    "button": {
+      "refresh": {
+        "name": "Refresh"
+      }
+    }
+  },
+  "services": {
+    "refresh": {
+      "name": "Refresh",
+      "description": "Fetch the latest PAIP data now.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Config entry",
+          "description": "Leave empty to refresh all."
+        }
+      }
+    },
+    "generate_bill_pdf": {
+      "name": "Generate bill PDF",
+      "description": "Render a bill as a PDF (same layout as the PahangGo app) into /config/www/paip/, served at /local/paip/.",
+      "fields": {
+        "account_number": {
+          "name": "Account number",
+          "description": "A configured PAIP account."
+        },
+        "bill_number": {
+          "name": "Bill number",
+          "description": "MMYYYY, e.g. 102026. Leave empty for the latest bill."
+        }
+      }
+    }
+  },
+  "exceptions": {
+    "entry_not_loaded": {
+      "message": "That PAIP entry isn't loaded."
+    },
+    "account_not_configured": {
+      "message": "That account isn't configured in PAIP."
+    },
+    "bill_not_found": {
+      "message": "Bill {bill_number} isn't among the last six bills."
+    }
+  }
+}

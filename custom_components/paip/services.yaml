@@ -1,0 +1,19 @@
+refresh:
+  fields:
+    config_entry_id:
+      required: false
+      selector:
+        config_entry:
+          integration: paip
+generate_bill_pdf:
+  fields:
+    account_number:
+      required: true
+      example: "0312345678"
+      selector:
+        text:
+    bill_number:
+      required: false
+      example: "102026"
+      selector:
+        text:

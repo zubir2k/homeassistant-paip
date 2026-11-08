@@ -1,0 +1,23 @@
+{
+  "domain": "paip",
+  "name": "PAIP (Air Pahang)",
+  "after_dependencies": [
+    "recorder"
+  ],
+  "categories": [
+    "water",
+    "local_services"
+  ],
+  "codeowners": [
+    "@zubir2k"
+  ],
+  "config_flow": true,
+  "documentation": "https://github.com/zubir2k/homeassistant-paip",
+  "integration_type": "hub",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/zubir2k/homeassistant-paip/issues",
+  "requirements": [
+    "reportlab>=4.0"
+  ],
+  "version": "0.1.0"
+}
