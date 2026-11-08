@@ -123,7 +123,7 @@
     },
     "generate_bill_pdf": {
       "name": "Generate bill PDF",
-      "description": "Render a bill as a PDF (same layout as the PahangGo app) into /config/www/paip/, served at /local/paip/.",
+      "description": "Render a bill as a PDF (same layout as the PahangGo app) and return a private, time-limited link to it. Files are kept in /config/paip_bills/, not in the public /config/www.",
       "fields": {
         "account_number": {
           "name": "Account number",
@@ -132,6 +132,10 @@
         "bill_number": {
           "name": "Bill number",
           "description": "MMYYYY, e.g. 102026. Leave empty for the latest bill."
+        },
+        "expires": {
+          "name": "Link valid for",
+          "description": "Hours the returned link works (1–168). Links also stop working when Home Assistant restarts."
         }
       }
     }

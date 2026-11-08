@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import os
+from datetime import timedelta
 
 import voluptuous as vol
+from homeassistant.components.http.auth import async_sign_path
 from homeassistant.config_entries import ConfigEntryState
 from homeassistant.core import (
     HomeAssistant,
@@ -15,13 +17,18 @@ from homeassistant.core import (
 )
 from homeassistant.exceptions import ServiceValidationError
 from homeassistant.helpers import config_validation as cv
+from homeassistant.helpers.network import NoURLAvailableError, get_url
+from homeassistant.util import dt as dt_util
 
 from .api import normalise_account
 from .const import (
     ATTR_ACCOUNT_NUMBER,
     ATTR_BILL_NUMBER,
     ATTR_CONFIG_ENTRY_ID,
+    ATTR_EXPIRES,
+    DEFAULT_LINK_HOURS,
     DOMAIN,
+    MAX_LINK_HOURS,
     PDF_SUBDIR,
     PDF_URL_PREFIX,
     SERVICE_GENERATE_BILL_PDF,
@@ -35,6 +42,9 @@ PDF_SCHEMA = vol.Schema(
     {
         vol.Required(ATTR_ACCOUNT_NUMBER): cv.string,
         vol.Optional(ATTR_BILL_NUMBER): cv.string,
+        vol.Optional(ATTR_EXPIRES, default=DEFAULT_LINK_HOURS): vol.All(
+            vol.Coerce(int), vol.Range(min=1, max=MAX_LINK_HOURS)
+        ),
     }
 )
 
@@ -89,9 +99,21 @@ def async_setup_services(hass: HomeAssistant) -> None:
             render_bill(bill.raw, path)
 
         await hass.async_add_executor_job(_write)
+        hours = call.data[ATTR_EXPIRES]
+        # Signed link: works in a notification tap without a login prompt, stops
+        # working after `expires` hours (or on restart), and never touches /local.
+        url = async_sign_path(
+            hass, f"{PDF_URL_PREFIX}/{filename}", timedelta(hours=hours)
+        )
+        try:
+            full_url = get_url(hass, allow_internal=False, prefer_cloud=False) + url
+        except NoURLAvailableError:
+            full_url = None
         return {
             "path": path,
-            "url": f"{PDF_URL_PREFIX}/{filename}",
+            "url": url,
+            "external_url": full_url,
+            "expires_at": (dt_util.now() + timedelta(hours=hours)).isoformat(),
             "bill_number": bill.bill_number,
         }
 

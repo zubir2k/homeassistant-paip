@@ -25,6 +25,13 @@ MODEL = "Water account"
 CURRENCY_RM = "MYR"
 TIME_ZONE = "Asia/Kuala_Lumpur"
 
-# Generated bills land in <config>/www/paip -> served at /local/paip/
-PDF_SUBDIR = ("www", "paip")
-PDF_URL_PREFIX = "/local/paip"
+# Generated bills are kept OUT of /config/www (which /local serves to anyone).
+# They live in <config>/paip_bills and are served only through an authenticated
+# view; the action hands out short-lived signed links.
+PDF_SUBDIR = ("paip_bills",)
+LEGACY_PDF_SUBDIR = ("www", "paip")
+PDF_URL_PREFIX = "/api/paip/bill"
+PDF_FILENAME_RE = r"bil_\d{10}_\d{6}\.pdf"
+ATTR_EXPIRES = "expires"
+DEFAULT_LINK_HOURS = 24
+MAX_LINK_HOURS = 168

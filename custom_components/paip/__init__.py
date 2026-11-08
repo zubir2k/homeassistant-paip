@@ -2,6 +2,10 @@
 
 from __future__ import annotations
 
+import logging
+import os
+import shutil
+
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import config_validation as cv
@@ -10,7 +14,15 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.typing import ConfigType
 
 from .api import PaipClient
-from .const import CONF_ACCOUNT_NUMBER, CONF_ACCOUNTS, DOMAIN, PLATFORMS
+from .const import (
+    CONF_ACCOUNT_NUMBER,
+    CONF_ACCOUNTS,
+    DOMAIN,
+    LEGACY_PDF_SUBDIR,
+    PDF_SUBDIR,
+    PLATFORMS,
+)
+from .views import PaipBillView
 from .coordinator import PaipCoordinator
 from .services import async_setup_services
 
@@ -19,9 +31,36 @@ type PaipConfigEntry = ConfigEntry[PaipCoordinator]
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
 
+_LOGGER = logging.getLogger(__name__)
+
+
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     async_setup_services(hass)
+    hass.http.register_view(PaipBillView(hass))
+    await hass.async_add_executor_job(_move_legacy_pdfs, hass)
     return True
+
+
+def _move_legacy_pdfs(hass: HomeAssistant) -> None:
+    """Move PDFs made by early builds out of the public /config/www/paip."""
+    old = hass.config.path(*LEGACY_PDF_SUBDIR)
+    if not os.path.isdir(old):
+        return
+    new = hass.config.path(*PDF_SUBDIR)
+    os.makedirs(new, exist_ok=True)
+    moved = 0
+    for name in os.listdir(old):
+        if name.startswith("bil_") and name.endswith(".pdf"):
+            shutil.move(os.path.join(old, name), os.path.join(new, name))
+            moved += 1
+    if not os.listdir(old):
+        os.rmdir(old)
+    if moved:
+        _LOGGER.warning(
+            "Moved %s bill PDF(s) out of the public /config/www/paip into /config/%s",
+            moved,
+            os.path.join(*PDF_SUBDIR),
+        )
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: PaipConfigEntry) -> bool:
