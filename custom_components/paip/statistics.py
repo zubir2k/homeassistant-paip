@@ -36,7 +36,7 @@ _LOGGER = logging.getLogger(__name__)
 
 def spread_bills(bills: list[Bill]) -> list[tuple[date, float, float]]:
     """Return ``(day, usage_m3, cost_rm)`` per day, oldest first."""
-    days: list[tuple[date, float, float]] = []
+    by_day: dict[date, tuple[float, float]] = {}
     for bill in sorted(
         (b for b in bills if b.reading_date or b.bill_date),
         key=lambda b: b.reading_date or b.bill_date,
@@ -47,11 +47,11 @@ def spread_bills(bills: list[Bill]) -> list[tuple[date, float, float]]:
         if length <= 0:
             continue
         cost = bill.water_charge_rm or 0.0
+        daily_usage = bill.usage_m3 / length
+        daily_cost = cost / length
         for offset in range(1, length + 1):
-            days.append(
-                (start + timedelta(days=offset), bill.usage_m3 / length, cost / length)
-            )
-    return days
+            by_day[start + timedelta(days=offset)] = (daily_usage, daily_cost)
+    return [(day, usage, cost) for day, (usage, cost) in sorted(by_day.items())]
 
 
 async def async_import_bill_statistics(
@@ -95,6 +95,7 @@ async def _import(
         start = datetime(day.year, day.month, day.day, tzinfo=tz)
         if last_ts is not None and start.timestamp() <= last_ts:
             continue
+        last_ts = start.timestamp()
         total += value
         stats.append(StatisticData(start=start, state=round(value, 4), sum=round(total, 4)))
     if not stats:

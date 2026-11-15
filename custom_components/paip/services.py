@@ -8,6 +8,7 @@ from datetime import timedelta
 import voluptuous as vol
 from homeassistant.components.http.auth import async_sign_path
 from homeassistant.config_entries import ConfigEntryState
+from homeassistant.const import ATTR_CONFIG_ENTRY_ID
 from homeassistant.core import (
     HomeAssistant,
     ServiceCall,
@@ -15,43 +16,41 @@ from homeassistant.core import (
     SupportsResponse,
     callback,
 )
-from homeassistant.exceptions import ServiceValidationError
+from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.network import NoURLAvailableError, get_url
 from homeassistant.util import dt as dt_util
 
 from .api import normalise_account
 from .const import (
-    ATTR_ACCOUNT_NUMBER,
-    ATTR_BILL_NUMBER,
-    ATTR_CONFIG_ENTRY_ID,
-    ATTR_EXPIRES,
     DEFAULT_LINK_HOURS,
     DOMAIN,
     MAX_LINK_HOURS,
     PDF_SUBDIR,
     PDF_URL_PREFIX,
-    SERVICE_GENERATE_BILL_PDF,
-    SERVICE_REFRESH,
+    PaipService,
+    PaipServiceArgument,
 )
+from .coordinator import PaipConfigEntry
 
 REFRESH_SCHEMA = vol.Schema(
     {vol.Optional(ATTR_CONFIG_ENTRY_ID): vol.All(cv.ensure_list, [cv.string])}
 )
 PDF_SCHEMA = vol.Schema(
     {
-        vol.Required(ATTR_ACCOUNT_NUMBER): cv.string,
-        vol.Optional(ATTR_BILL_NUMBER): cv.string,
-        vol.Optional(ATTR_EXPIRES, default=DEFAULT_LINK_HOURS): vol.All(
-            vol.Coerce(int), vol.Range(min=1, max=MAX_LINK_HOURS)
-        ),
+        vol.Required(PaipServiceArgument.ACCOUNT_NUMBER): cv.string,
+        vol.Optional(PaipServiceArgument.BILL_NUMBER): cv.string,
+        vol.Optional(
+            PaipServiceArgument.EXPIRES, default=DEFAULT_LINK_HOURS
+        ): vol.All(vol.Coerce(int), vol.Range(min=1, max=MAX_LINK_HOURS)),
     }
 )
 
 
-def _loaded(hass: HomeAssistant):
+def _loaded(hass: HomeAssistant) -> list[PaipConfigEntry]:
     return [
-        e for e in hass.config_entries.async_entries(DOMAIN)
+        e
+        for e in hass.config_entries.async_entries(DOMAIN)
         if e.state is ConfigEntryState.LOADED
     ]
 
@@ -69,8 +68,8 @@ def async_setup_services(hass: HomeAssistant) -> None:
             await entry.runtime_data.async_refresh()
 
     async def _generate_pdf(call: ServiceCall) -> ServiceResponse:
-        number = normalise_account(call.data[ATTR_ACCOUNT_NUMBER])
-        bill_no = call.data.get(ATTR_BILL_NUMBER)
+        number = normalise_account(call.data[PaipServiceArgument.ACCOUNT_NUMBER])
+        bill_no = call.data.get(PaipServiceArgument.BILL_NUMBER)
         account = None
         for entry in _loaded(hass):
             account = (entry.runtime_data.data or {}).get(number)
@@ -79,6 +78,10 @@ def async_setup_services(hass: HomeAssistant) -> None:
         if account is None:
             raise ServiceValidationError(
                 translation_domain=DOMAIN, translation_key="account_not_configured"
+            )
+        if not account.bills:
+            raise ServiceValidationError(
+                translation_domain=DOMAIN, translation_key="no_bills"
             )
         bill = account.bill(bill_no)
         if bill is None:
@@ -98,8 +101,15 @@ def async_setup_services(hass: HomeAssistant) -> None:
             os.makedirs(folder, exist_ok=True)
             render_bill(bill.raw, path)
 
-        await hass.async_add_executor_job(_write)
-        hours = call.data[ATTR_EXPIRES]
+        try:
+            await hass.async_add_executor_job(_write)
+        except Exception as err:
+            raise HomeAssistantError(
+                translation_domain=DOMAIN,
+                translation_key="pdf_generation_failed",
+                translation_placeholders={"error": str(err)},
+            ) from err
+        hours = call.data[PaipServiceArgument.EXPIRES]
         # Signed link: works in a notification tap without a login prompt, stops
         # working after `expires` hours (or on restart), and never touches /local.
         url = async_sign_path(
@@ -117,10 +127,12 @@ def async_setup_services(hass: HomeAssistant) -> None:
             "bill_number": bill.bill_number,
         }
 
-    hass.services.async_register(DOMAIN, SERVICE_REFRESH, _refresh, schema=REFRESH_SCHEMA)
+    hass.services.async_register(
+        DOMAIN, PaipService.REFRESH, _refresh, schema=REFRESH_SCHEMA
+    )
     hass.services.async_register(
         DOMAIN,
-        SERVICE_GENERATE_BILL_PDF,
+        PaipService.GENERATE_BILL_PDF,
         _generate_pdf,
         schema=PDF_SCHEMA,
         supports_response=SupportsResponse.OPTIONAL,

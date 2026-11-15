@@ -18,10 +18,12 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import StateType
 
-from . import PaipConfigEntry
 from .api import AccountData, Bill, payment_url
 from .const import CURRENCY_RM
+from .coordinator import PaipConfigEntry, PaipCoordinator
 from .entity import PaipEntity
+
+PARALLEL_UPDATES = 0
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -213,7 +215,6 @@ SENSORS: tuple[PaipSensorDescription, ...] = (
         key="account_status",
         translation_key="account_status",
         entity_category=EntityCategory.DIAGNOSTIC,
-        icon="mdi:water-check",
         value_fn=lambda d: d.portal_status or d.status,
         attrs_fn=lambda d: {
             "disconnection_charge_rm": d.disconnection_charge_rm,
@@ -243,8 +244,24 @@ async def async_setup_entry(
 
 class PaipSensor(PaipEntity, SensorEntity):
     entity_description: PaipSensorDescription
+    _unrecorded_attributes = frozenset(
+        {
+            "account_number",
+            "premise_number",
+            "owner",
+            "address",
+            "tariff",
+            "bill_history",
+            "tariff_blocks",
+        }
+    )
 
-    def __init__(self, coordinator, account_number, description) -> None:
+    def __init__(
+        self,
+        coordinator: PaipCoordinator,
+        account_number: str,
+        description: PaipSensorDescription,
+    ) -> None:
         super().__init__(coordinator, account_number, description.key)
         self.entity_description = description
 

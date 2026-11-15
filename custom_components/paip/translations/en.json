@@ -11,6 +11,17 @@
         "data_description": {
           "nickname": "Used for the device name, e.g. Rumah Temerloh. Defaults to the street address."
         }
+      },
+      "reconfigure": {
+        "title": "Reconfigure PAIP water account",
+        "description": "Add a PAIP water account or update the nickname of an existing account.",
+        "data": {
+          "account_number": "Account number",
+          "nickname": "Nickname (optional)"
+        },
+        "data_description": {
+          "nickname": "Used for the device name, e.g. Rumah Temerloh. Defaults to the street address."
+        }
       }
     },
     "error": {
@@ -22,7 +33,8 @@
     },
     "abort": {
       "already_configured": "PAIP is already set up.",
-      "account_added": "Added {nickname} to your PAIP accounts."
+      "account_added": "Added {nickname} to your PAIP accounts.",
+      "reconfigure_successful": "Re-configuration was successful."
     }
   },
   "options": {
@@ -141,14 +153,26 @@
     }
   },
   "exceptions": {
+    "update_failed": {
+      "message": "Failed to update PAIP accounts: {errors}"
+    },
+    "no_accounts_configured": {
+      "message": "No PAIP accounts are configured."
+    },
     "entry_not_loaded": {
       "message": "That PAIP entry isn't loaded."
     },
     "account_not_configured": {
       "message": "That account isn't configured in PAIP."
     },
+    "no_bills": {
+      "message": "No bills are available for this account."
+    },
     "bill_not_found": {
       "message": "Bill {bill_number} isn't among the last six bills."
+    },
+    "pdf_generation_failed": {
+      "message": "Failed to generate bill PDF: {error}"
     }
   }
 }

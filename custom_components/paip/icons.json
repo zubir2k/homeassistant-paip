@@ -12,7 +12,8 @@
       "bill_date": {"default": "mdi:calendar-text"},
       "due_date": {"default": "mdi:calendar-alert"},
       "last_payment_amount": {"default": "mdi:cash-check"},
-      "last_payment_date": {"default": "mdi:calendar-check"}
+      "last_payment_date": {"default": "mdi:calendar-check"},
+      "account_status": {"default": "mdi:water-check"}
     },
     "binary_sensor": {"overdue": {"default": "mdi:water-alert"}},
     "button": {"refresh": {"default": "mdi:refresh"}}

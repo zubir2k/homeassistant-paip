@@ -8,7 +8,7 @@ from typing import Any
 from homeassistant.components.diagnostics import async_redact_data
 from homeassistant.core import HomeAssistant
 
-from . import PaipConfigEntry
+from .coordinator import PaipConfigEntry
 
 # The PahangGo lookup is unauthenticated, so an account number alone exposes
 # the owner's name and address. Never let any of these leave the box.
@@ -20,13 +20,19 @@ TO_REDACT = {
     "nickname",
     "meter_number",
     "last_payment_receipt",
+    "bill_number",
+    "serial_number",
     "NO_AKAUN",
+    "NO_AKAUN_LAMA",
+    "NO_KONTRAK",
     "NO_PREMIS",
     "NO_INVOIS",
     "NAMA",
     "ALAMAT1",
     "ALAMAT2",
     "ALAMAT3",
+    "EMAIL",
+    "NO_TELEFON",
     "NO_METER",
     "BAYAR_DAHULU_NO_RESIT",
     "DEPOSIT",

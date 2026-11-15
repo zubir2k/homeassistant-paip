@@ -6,7 +6,6 @@ import logging
 import os
 import shutil
 
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers import device_registry as dr
@@ -22,11 +21,9 @@ from .const import (
     PDF_SUBDIR,
     PLATFORMS,
 )
-from .views import PaipBillView
-from .coordinator import PaipCoordinator
+from .coordinator import PaipConfigEntry, PaipCoordinator
 from .services import async_setup_services
-
-type PaipConfigEntry = ConfigEntry[PaipCoordinator]
+from .views import PaipBillView
 
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 

@@ -58,6 +58,9 @@ async def _validate(
         return None, {"base": "cannot_connect"}, {}
     except PaipError as err:
         _LOGGER.debug("PAIP lookup failed: %s", err)
+        return None, {"base": "cannot_connect"}, {}
+    except Exception:  # noqa: BLE001
+        _LOGGER.exception("Unexpected error validating PAIP account")
         return None, {"base": "unknown"}, {}
     nickname = (user_input.get(CONF_NICKNAME) or "").strip()
     if not nickname:
@@ -98,6 +101,42 @@ class PaipConfigFlow(ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id="user",
             data_schema=self.add_suggested_values_to_schema(ACCOUNT_SCHEMA, user_input or {}),
+            errors=errors,
+        )
+
+    async def async_step_reconfigure(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Reconfigure an existing PAIP config entry."""
+        errors: dict[str, str] = {}
+        entry = self._get_reconfigure_entry()
+        existing = list(entry.data.get(CONF_ACCOUNTS, []))
+        if user_input is not None:
+            number = normalise_account(user_input.get(CONF_ACCOUNT_NUMBER, ""))
+            others = [a for a in existing if a[CONF_ACCOUNT_NUMBER] != number]
+            account, errors, _ = await _validate(self.hass, user_input, others)
+            if account:
+                if any(
+                    a[CONF_ACCOUNT_NUMBER] == account[CONF_ACCOUNT_NUMBER]
+                    for a in existing
+                ):
+                    updated = [
+                        account
+                        if a[CONF_ACCOUNT_NUMBER] == account[CONF_ACCOUNT_NUMBER]
+                        else a
+                        for a in existing
+                    ]
+                else:
+                    updated = [*existing, account]
+                return self.async_update_reload_and_abort(
+                    entry,
+                    data_updates={CONF_ACCOUNTS: updated},
+                )
+
+        suggested = user_input or (existing[0] if existing else {})
+        return self.async_show_form(
+            step_id="reconfigure",
+            data_schema=self.add_suggested_values_to_schema(ACCOUNT_SCHEMA, suggested),
             errors=errors,
         )
 

@@ -8,7 +8,7 @@ Input: one entry from
   -> data[0].raw_data.SENARAI_BIL_DETAIL[n]
 
 Usage:
-  from paip_bill_pdf import render_bill
+  from custom_components.paip.bill_pdf import render_bill
   pdf_bytes = render_bill(bill_dict)            # returns bytes
   render_bill(bill_dict, "bil_102026.pdf")      # or writes a file
 
@@ -115,7 +115,6 @@ class _Page:
         for i, row in enumerate(rows):
             for x, v in zip(cols, row):
                 self.txt(x + 4, top + hh + 4, v, 9)
-                pass
             top += rh
         return bottom
 

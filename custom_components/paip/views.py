@@ -22,14 +22,15 @@ class PaipBillView(HomeAssistantView):
     name = "api:paip:bill"
     requires_auth = True
 
-    def __init__(self, hass: HomeAssistant) -> None:
-        self._folder = hass.config.path(*PDF_SUBDIR)
+    def __init__(self, hass: HomeAssistant, bill_dir: str | None = None) -> None:
+        self.hass = hass
+        self._folder = bill_dir or hass.config.path(*PDF_SUBDIR)
 
     async def get(self, request: web.Request, filename: str) -> web.StreamResponse:
         if not _NAME.match(filename):
             return web.Response(status=HTTPStatus.NOT_FOUND)
         path = os.path.join(self._folder, filename)
-        if not os.path.isfile(path):
+        if not await self.hass.async_add_executor_job(os.path.isfile, path):
             return web.Response(status=HTTPStatus.NOT_FOUND)
         return web.FileResponse(
             path,

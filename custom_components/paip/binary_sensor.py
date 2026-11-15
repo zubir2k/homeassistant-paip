@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 from homeassistant.components.binary_sensor import (
     BinarySensorDeviceClass,
     BinarySensorEntity,
@@ -10,10 +12,12 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.util import dt as dt_util
 
-from . import PaipConfigEntry
 from .api import payment_url
 from .const import TIME_ZONE
+from .coordinator import PaipConfigEntry, PaipCoordinator
 from .entity import PaipEntity
+
+PARALLEL_UPDATES = 0
 
 
 async def async_setup_entry(
@@ -31,7 +35,7 @@ class OverdueSensor(PaipEntity, BinarySensorEntity):
     _attr_translation_key = "overdue"
     _attr_device_class = BinarySensorDeviceClass.PROBLEM
 
-    def __init__(self, coordinator, account_number: str) -> None:
+    def __init__(self, coordinator: PaipCoordinator, account_number: str) -> None:
         super().__init__(coordinator, account_number, "overdue")
 
     @property
@@ -43,7 +47,7 @@ class OverdueSensor(PaipEntity, BinarySensorEntity):
         return data.is_overdue(today)
 
     @property
-    def extra_state_attributes(self):
+    def extra_state_attributes(self) -> dict[str, Any] | None:
         data = self.account_data
         if data is None or data.latest_bill is None:
             return None
