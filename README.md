@@ -104,7 +104,7 @@ Run it from **Developer tools → Actions** (tick *Return response*), or in an a
 - stops working after `expires` hours, or when Home Assistant restarts (run the action again for a fresh link);
 - only opens that one file.
 
-Use `url` in Companion app notifications. Use `external_url` (built from your external or Nabu Casa URL, or empty if none is set) for anything that opens outside the app, such as Telegram or email. Treat it like a password until it expires.
+Use `url` in Companion app notifications, or `external_url` (built from your external or Nabu Casa URL, or empty if none is set) for notifications opened outside the app (such as Telegram or email).
 
 Notes:
 - Only the **last six bills** are available, because that is all PAIP's data returns.
@@ -291,7 +291,7 @@ Go to Settings → Devices & services → PAIP → ⋮ → **Delete**. Then unin
 
 ## Disclaimer
 
-This is unofficial and not affiliated with PAIP or PahangGo. It uses undocumented endpoints that may change without notice.
+This is an independent community project and is not affiliated with, endorsed by, or connected to Pengurusan Air Pahang Berhad (PAIP) or PahangGo.
 
 ## Join us
 
