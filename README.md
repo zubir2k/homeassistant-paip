@@ -19,21 +19,31 @@ PAIP closed its OnlinePay portal and now presents bills through the **PahangGo**
 - **Bill PDF**: `paip.generate_bill_pdf` recreates the PahangGo bill as a PDF ([details](#bill-pdf)).
 - **Pay link**: a `payment_url` attribute for alerts with a *Bayar sekarang* button ([examples](#automation-examples)).
 
-## Install
+## Installation
+#### With Marketplace/HACS
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=zubir2k&repository=homeassistant-paip&category=integration)
 
-Works with Home Assistant 2024.12 or newer, and is ready for the built-in **Marketplace** in 2026.11.
+> [!Tip]
+> If you are unable to use the button above, manually search for PAIP (Air Pahang) in Marketplace/HACS.
 
-[![Open your Home Assistant instance and open this repository in the Marketplace.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=zubir2k&repository=homeassistant-paip&category=integration)
+#### Manual
+1. Copy the `paip` directory from `custom_components` in this repository and place inside your Home Assistant's `custom_components` directory.
+2. Restart Home Assistant
+3. Follow the instructions in the `Setup` section
 
-**Marketplace (HA 2026.11+):** go to Settings → Marketplace → **Add from link**, enter `zubir2k/homeassistant-paip`, then **Install**. No restart is needed on first install.
+> [!WARNING]
+> If installing manually, in order to be alerted about new releases, you will need to subscribe to releases from this repository.
 
-**HACS (HA 2026.10 or older):** go to HACS → ⋮ → Custom repositories, add this repo as *Integration*, install **PAIP (Air Pahang)**, then restart.
-
-**Manual:** copy `custom_components/paip` into `/config/custom_components/`, then restart.
-
-Then add the integration. Enter the 10-digit account number; a nickname is optional.
-
+## Setup
 [![Open your Home Assistant instance and start setting up PAIP.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=paip)
+
+> [!Tip]
+> If you are unable to use the button above, follow the steps below:
+> 1. Navigate to the Home Assistant Integrations page (Settings --> Devices & Services)
+> 2. Click the `+ ADD INTEGRATION` button in the lower right-hand corner
+> 3. Search for `PAIP (Air Pahang)`
+
+Enter the 10-digit account number; a nickname is optional.
 
 ### Multiple accounts
 All accounts live under one PAIP entry, with one device per account.
