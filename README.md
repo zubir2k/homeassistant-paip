@@ -289,13 +289,6 @@ Button cards can't template a URL, so paste your account's link. You can copy it
 
 Go to Settings → Devices & services → PAIP → ⋮ → **Delete**. Then uninstall it from the Marketplace (or HACS). PDFs you generated stay in `/config/paip_bills/` until you delete them.
 
-## Privacy
-
-- The bill lookup is unauthenticated, so anyone with an account number can see the owner's name and address. Never post account numbers in public issues or screenshots.
-- Inside Home Assistant, the owner's name and address appear only as attributes of the diagnostic **Account status** sensor, and in the bill PDFs.
-- Bill PDFs are never put in `/config/www` or `/local/`. They open only for a signed-in user or through an expiring signed link (see [Bill PDF](#bill-pdf)).
-- Diagnostics downloads redact account numbers, names, addresses, and meter and receipt numbers.
-
 ## Disclaimer
 
 This is unofficial and not affiliated with PAIP or PahangGo. It uses undocumented endpoints that may change without notice.
