@@ -19,9 +19,9 @@
   "integration_type": "hub",
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/zubir2k/homeassistant-paip/issues",
+  "quality_scale": "bronze",
   "requirements": [
     "reportlab>=4.0"
   ],
-  "version": "0.1.5",
-  "quality_scale": "bronze"
+  "version": "0.1.5"
 }
