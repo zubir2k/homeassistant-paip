@@ -2,8 +2,9 @@
 
 from datetime import timedelta
 from enum import StrEnum
+from zoneinfo import ZoneInfo
 
-from homeassistant.const import ATTR_CONFIG_ENTRY_ID, Platform
+from homeassistant.const import Platform
 
 DOMAIN = "paip"
 PLATFORMS: list[Platform] = [
@@ -12,6 +13,7 @@ PLATFORMS: list[Platform] = [
     Platform.BUTTON,
 ]
 
+ATTR_CONFIG_ENTRY_ID = "config_entry_id"
 CONF_ACCOUNTS = "accounts"
 CONF_ACCOUNT_NUMBER = "account_number"
 CONF_NICKNAME = "nickname"
@@ -39,13 +41,15 @@ class PaipServiceArgument(StrEnum):
 
 SERVICE_REFRESH = PaipService.REFRESH
 SERVICE_GENERATE_BILL_PDF = PaipService.GENERATE_BILL_PDF
-ATTR_ACCOUNT_NUMBER = PaipServiceArgument.ACCOUNT_NUMBER
-ATTR_BILL_NUMBER = PaipServiceArgument.BILL_NUMBER
+ATTR_ACCOUNT_NUMBER = "account_number"
+ATTR_BILL_NUMBER = "bill_number"
+ATTR_EXPIRES = "expires"
 
 MANUFACTURER = "Pengurusan Air Pahang Berhad"
 MODEL = "Water account"
 CURRENCY_RM = "MYR"
 TIME_ZONE = "Asia/Kuala_Lumpur"
+TIME_ZONE_OBJ = ZoneInfo(TIME_ZONE)
 
 # Generated bills are kept OUT of /config/www (which /local serves to anyone).
 # They live in <config>/paip_bills and are served only through an authenticated
@@ -54,7 +58,6 @@ PDF_SUBDIR = ("paip_bills",)
 LEGACY_PDF_SUBDIR = ("www", "paip")
 PDF_URL_PREFIX = "/api/paip/bill"
 PDF_FILENAME_RE = r"bil_\d{10}_\d{6}\.pdf"
-ATTR_EXPIRES = PaipServiceArgument.EXPIRES
 DEFAULT_LINK_HOURS = 24
 MAX_LINK_HOURS = 168
 
@@ -84,4 +87,5 @@ __all__ = [
     "SERVICE_GENERATE_BILL_PDF",
     "SERVICE_REFRESH",
     "TIME_ZONE",
+    "TIME_ZONE_OBJ",
 ]

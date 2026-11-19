@@ -8,7 +8,6 @@ from datetime import timedelta
 import voluptuous as vol
 from homeassistant.components.http.auth import async_sign_path
 from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import ATTR_CONFIG_ENTRY_ID
 from homeassistant.core import (
     HomeAssistant,
     ServiceCall,
@@ -24,13 +23,16 @@ from homeassistant.util import dt as dt_util
 from paip import normalise_account
 
 from .const import (
+    ATTR_ACCOUNT_NUMBER,
+    ATTR_BILL_NUMBER,
+    ATTR_CONFIG_ENTRY_ID,
+    ATTR_EXPIRES,
     DEFAULT_LINK_HOURS,
     DOMAIN,
     MAX_LINK_HOURS,
     PDF_SUBDIR,
     PDF_URL_PREFIX,
     PaipService,
-    PaipServiceArgument,
 )
 from .coordinator import PaipConfigEntry
 
@@ -39,9 +41,9 @@ REFRESH_SCHEMA = vol.Schema(
 )
 PDF_SCHEMA = vol.Schema(
     {
-        vol.Required(PaipServiceArgument.ACCOUNT_NUMBER): cv.string,
-        vol.Optional(PaipServiceArgument.BILL_NUMBER): cv.string,
-        vol.Optional(PaipServiceArgument.EXPIRES, default=DEFAULT_LINK_HOURS): vol.All(
+        vol.Required(ATTR_ACCOUNT_NUMBER): cv.string,
+        vol.Optional(ATTR_BILL_NUMBER): cv.string,
+        vol.Optional(ATTR_EXPIRES, default=DEFAULT_LINK_HOURS): vol.All(
             vol.Coerce(int), vol.Range(min=1, max=MAX_LINK_HOURS)
         ),
     }
@@ -69,8 +71,8 @@ def async_setup_services(hass: HomeAssistant) -> None:
             await entry.runtime_data.async_refresh()
 
     async def _generate_pdf(call: ServiceCall) -> ServiceResponse:
-        number = normalise_account(call.data[PaipServiceArgument.ACCOUNT_NUMBER])
-        bill_no = call.data.get(PaipServiceArgument.BILL_NUMBER)
+        number = normalise_account(call.data[ATTR_ACCOUNT_NUMBER])
+        bill_no = call.data.get(ATTR_BILL_NUMBER)
         account = None
         for entry in _loaded(hass):
             account = (entry.runtime_data.data or {}).get(number)
@@ -110,7 +112,7 @@ def async_setup_services(hass: HomeAssistant) -> None:
                 translation_key="pdf_generation_failed",
                 translation_placeholders={"error": str(err)},
             ) from err
-        hours = call.data[PaipServiceArgument.EXPIRES]
+        hours = call.data[ATTR_EXPIRES]
         # Signed link: works in a notification tap without a login prompt, stops
         # working after `expires` hours (or on restart), and never touches /local.
         url = async_sign_path(

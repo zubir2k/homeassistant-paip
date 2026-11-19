@@ -14,7 +14,7 @@ from homeassistant.util import dt as dt_util
 
 from paip import payment_url
 
-from .const import TIME_ZONE
+from .const import TIME_ZONE_OBJ
 from .coordinator import PaipConfigEntry, PaipCoordinator
 from .entity import PaipEntity
 
@@ -44,7 +44,7 @@ class OverdueSensor(PaipEntity, BinarySensorEntity):
         data = self.account_data
         if data is None:
             return None
-        today = dt_util.now(dt_util.get_time_zone(TIME_ZONE)).date()
+        today = dt_util.now(TIME_ZONE_OBJ).date()
         return data.is_overdue(today)
 
     @property

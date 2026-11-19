@@ -30,7 +30,7 @@ from homeassistant.util import dt as dt_util
 
 from paip import AccountData, Bill
 
-from .const import CURRENCY_RM, DOMAIN, TIME_ZONE
+from .const import CURRENCY_RM, DOMAIN, TIME_ZONE_OBJ
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -89,7 +89,6 @@ async def _import(
     unit: str,
     series: list[tuple[date, float]],
 ) -> None:
-    tz = dt_util.get_time_zone(TIME_ZONE)
     last = await get_instance(hass).async_add_executor_job(
         get_last_statistics, hass, 1, statistic_id, True, {"sum"}
     )
@@ -101,7 +100,7 @@ async def _import(
 
     stats: list[StatisticData] = []
     for day, value in series:
-        start = datetime(day.year, day.month, day.day, tzinfo=tz)
+        start = datetime(day.year, day.month, day.day, tzinfo=TIME_ZONE_OBJ)
         if last_ts is not None and start.timestamp() <= last_ts:
             continue
         last_ts = start.timestamp()

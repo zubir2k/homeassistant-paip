@@ -1,6 +1,6 @@
 [project]
 name = "ha-paip"
-version = "0.1.6"
+version = "0.1.7"
 description = "Home Assistant custom integration for PAIP (Pengurusan Air Pahang Berhad)"
 requires-python = ">=3.12"
 
