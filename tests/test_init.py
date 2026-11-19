@@ -37,8 +37,8 @@ async def test_setup_and_unload(hass, mock_client):
 async def test_service_refresh(hass, mock_client):
     """Test paip.refresh service."""
     await _setup(hass)
-    _, coord_client = mock_client
-    coord_client.get_account.reset_mock()
+    _, init_client = mock_client
+    init_client.get_account.reset_mock()
 
     await hass.services.async_call(DOMAIN, "refresh", blocking=True)
-    coord_client.get_account.assert_awaited()
+    init_client.get_account.assert_awaited()

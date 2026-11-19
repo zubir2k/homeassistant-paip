@@ -100,4 +100,4 @@ def mock_client():
                 side_effect=lambda acc: make_account_data(account_number=acc)
             )
             client.get_portal_bill = AsyncMock(return_value=None)
-        yield flow_cls.return_value, coord_cls.return_value
+        yield flow_cls.return_value, init_cls.return_value

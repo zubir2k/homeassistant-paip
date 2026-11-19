@@ -31,14 +31,14 @@ async def test_sensors(hass, mock_client):
     entry = await _setup(hass)
     prefix = "sensor.paip_home_"
 
-    balance = hass.states.get(prefix + "outstanding_balance")
+    balance = hass.states.get(prefix + "balance")
     assert balance is not None
     assert balance.state == "12.0"
     assert balance.attributes["unit_of_measurement"] == "MYR"
 
-    credit = hass.states.get(prefix + "account_credit")
-    assert credit is not None
-    assert credit.state == "0.0"
+    amount_due = hass.states.get(prefix + "amount_due")
+    assert amount_due is not None
+    assert amount_due.state == "12.0"
 
     bill_amount = hass.states.get(prefix + "latest_bill_amount")
     assert bill_amount is not None
@@ -47,10 +47,6 @@ async def test_sensors(hass, mock_client):
     usage = hass.states.get(prefix + "latest_bill_usage")
     assert usage is not None
     assert usage.state == "25.0"
-
-    bill_no = hass.states.get(prefix + "bill_number")
-    assert bill_no is not None
-    assert bill_no.state == "082026"
 
     due_date = hass.states.get(prefix + "due_date")
     assert due_date is not None
@@ -72,11 +68,11 @@ async def test_binary_sensor_and_button(hass, mock_client):
     """Test payment overdue binary sensor and manual refresh button."""
     await _setup(hass)
 
-    overdue = hass.states.get("binary_sensor.paip_home_payment_overdue")
+    overdue = hass.states.get("binary_sensor.paip_home_overdue")
     assert overdue is not None
 
-    _, coord_client = mock_client
-    coord_client.get_account.reset_mock()
+    _, init_client = mock_client
+    init_client.get_account.reset_mock()
 
     await hass.services.async_call(
         "button",
@@ -84,4 +80,4 @@ async def test_binary_sensor_and_button(hass, mock_client):
         {"entity_id": "button.paip_home_refresh"},
         blocking=True,
     )
-    coord_client.get_account.assert_awaited()
+    init_client.get_account.assert_awaited()
