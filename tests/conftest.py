@@ -86,6 +86,7 @@ def mock_client():
     with (
         patch("custom_components.paip.async_get_clientsession"),
         patch("custom_components.paip.config_flow.async_get_clientsession"),
+        patch("custom_components.paip.PaipClient", autospec=True) as init_cls,
         patch(
             "custom_components.paip.coordinator.PaipClient", autospec=True
         ) as coord_cls,
@@ -93,7 +94,7 @@ def mock_client():
             "custom_components.paip.config_flow.PaipClient", autospec=True
         ) as flow_cls,
     ):
-        for cls in (coord_cls, flow_cls):
+        for cls in (init_cls, coord_cls, flow_cls):
             client = cls.return_value
             client.get_account = AsyncMock(
                 side_effect=lambda acc: make_account_data(account_number=acc)
