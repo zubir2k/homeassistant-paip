@@ -61,7 +61,7 @@ async def test_sensors(hass, mock_client):
     device = reg.async_get_device_by_identifier((DOMAIN, TEST_ACCOUNT), entry.entry_id)
     assert device is not None
     assert device.manufacturer == "Pengurusan Air Pahang Berhad"
-    assert device.model == "Water account"
+    assert device.model == "Water account (A0)"
 
 
 async def test_binary_sensor_and_button(hass, mock_client):
