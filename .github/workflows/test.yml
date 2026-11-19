@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.12", "3.13"]
+        python-version: ["3.14"]
     steps:
       - uses: actions/checkout@v4
       - name: Install uv
@@ -17,4 +17,4 @@ jobs:
       - name: Set up Python ${{ matrix.python-version }}
         run: uv python install ${{ matrix.python-version }}
       - name: Run pytest
-        run: uv run --python ${{ matrix.python-version }} --with pytest --with pytest-homeassistant-custom-component pytest
+        run: uv run --python ${{ matrix.python-version }} --with pytest --with pytest-homeassistant-custom-component --with python-paip --with reportlab pytest

@@ -12,7 +12,8 @@ from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.typing import ConfigType
 
-from .api import PaipClient
+from paip import PaipClient
+
 from .const import (
     CONF_ACCOUNT_NUMBER,
     CONF_ACCOUNTS,

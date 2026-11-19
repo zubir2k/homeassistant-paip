@@ -5,8 +5,8 @@
     "recorder"
   ],
   "categories": [
-    "water",
-    "local_services"
+    "local_services",
+    "water"
   ],
   "codeowners": [
     "@zubir2k"
@@ -19,9 +19,13 @@
   "integration_type": "hub",
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/zubir2k/homeassistant-paip/issues",
+  "loggers": [
+    "paip"
+  ],
   "quality_scale": "bronze",
   "requirements": [
+    "python-paip==0.1.0",
     "reportlab>=4.0"
   ],
-  "version": "0.1.5"
+  "version": "0.1.6"
 }

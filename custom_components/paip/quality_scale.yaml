@@ -8,7 +8,7 @@ rules:
   config-flow-test-coverage: done
   dependency-transparency:
     status: done
-    comment: Dependencies declared: ['reportlab>=4.0'].
+    comment: Dependencies declared: ['python-paip==0.1.0', 'reportlab>=4.0'].
   docs-actions: done
   docs-conditions:
     status: exempt

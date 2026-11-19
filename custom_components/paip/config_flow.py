@@ -20,8 +20,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import selector
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
-from .api import (
-    ACCOUNT_RE,
+from paip import (
     AccountData,
     PaipAccountNotFound,
     PaipClient,
@@ -29,7 +28,15 @@ from .api import (
     PaipError,
     normalise_account,
 )
-from .const import CONF_ACCOUNT_NUMBER, CONF_ACCOUNTS, CONF_NICKNAME, CONF_REMOVE, DOMAIN
+from paip.models import ACCOUNT_RE
+
+from .const import (
+    CONF_ACCOUNT_NUMBER,
+    CONF_ACCOUNTS,
+    CONF_NICKNAME,
+    CONF_REMOVE,
+    DOMAIN,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -51,7 +58,9 @@ async def _validate(
     if any(a[CONF_ACCOUNT_NUMBER] == number for a in existing):
         return None, {CONF_ACCOUNT_NUMBER: "already_added"}, {}
     try:
-        data: AccountData = await PaipClient(async_get_clientsession(hass)).get_account(number)
+        data: AccountData = await PaipClient(async_get_clientsession(hass)).get_account(
+            number
+        )
     except PaipAccountNotFound:
         return None, {CONF_ACCOUNT_NUMBER: "account_not_found"}, {}
     except PaipConnectionError:
@@ -79,7 +88,9 @@ class PaipConfigFlow(ConfigFlow, domain=DOMAIN):
 
     VERSION = 1
 
-    async def async_step_user(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
+    async def async_step_user(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
         errors: dict[str, str] = {}
         hub = _hub(self.hass)
         existing = list(hub.data.get(CONF_ACCOUNTS, [])) if hub else []
@@ -96,11 +107,15 @@ class PaipConfigFlow(ConfigFlow, domain=DOMAIN):
                     )
                 await self.async_set_unique_id(DOMAIN)
                 self._abort_if_unique_id_configured()
-                return self.async_create_entry(title="PAIP", data={CONF_ACCOUNTS: [account]})
+                return self.async_create_entry(
+                    title="PAIP", data={CONF_ACCOUNTS: [account]}
+                )
 
         return self.async_show_form(
             step_id="user",
-            data_schema=self.add_suggested_values_to_schema(ACCOUNT_SCHEMA, user_input or {}),
+            data_schema=self.add_suggested_values_to_schema(
+                ACCOUNT_SCHEMA, user_input or {}
+            ),
             errors=errors,
         )
 
@@ -148,8 +163,12 @@ class PaipConfigFlow(ConfigFlow, domain=DOMAIN):
 class PaipOptionsFlow(OptionsFlow):
     """Add or remove accounts on the existing PAIP entry."""
 
-    async def async_step_init(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
-        return self.async_show_menu(step_id="init", menu_options=["add_account", "remove_accounts"])
+    async def async_step_init(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        return self.async_show_menu(
+            step_id="init", menu_options=["add_account", "remove_accounts"]
+        )
 
     def _accounts(self) -> list[dict[str, Any]]:
         return list(self.config_entry.data.get(CONF_ACCOUNTS, []))
@@ -165,12 +184,16 @@ class PaipOptionsFlow(OptionsFlow):
     ) -> ConfigFlowResult:
         errors: dict[str, str] = {}
         if user_input is not None:
-            account, errors, _ = await _validate(self.hass, user_input, self._accounts())
+            account, errors, _ = await _validate(
+                self.hass, user_input, self._accounts()
+            )
             if account:
                 return self._save([*self._accounts(), account])
         return self.async_show_form(
             step_id="add_account",
-            data_schema=self.add_suggested_values_to_schema(ACCOUNT_SCHEMA, user_input or {}),
+            data_schema=self.add_suggested_values_to_schema(
+                ACCOUNT_SCHEMA, user_input or {}
+            ),
             errors=errors,
         )
 

@@ -18,7 +18,8 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import StateType
 
-from .api import AccountData, Bill, payment_url
+from paip import AccountData, Bill, payment_url
+
 from .const import CURRENCY_RM
 from .coordinator import PaipConfigEntry, PaipCoordinator
 from .entity import PaipEntity
@@ -201,7 +202,9 @@ SENSORS: tuple[PaipSensorDescription, ...] = (
         device_class=SensorDeviceClass.MONETARY,
         native_unit_of_measurement=CURRENCY_RM,
         suggested_display_precision=2,
-        value_fn=lambda d: d.last_payment.last_payment_amount_rm if d.last_payment else None,
+        value_fn=lambda d: (
+            d.last_payment.last_payment_amount_rm if d.last_payment else None
+        ),
         attrs_fn=_payment_attrs,
     ),
     PaipSensorDescription(

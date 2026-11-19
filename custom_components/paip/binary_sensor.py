@@ -12,7 +12,8 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.util import dt as dt_util
 
-from .api import payment_url
+from paip import payment_url
+
 from .const import TIME_ZONE
 from .coordinator import PaipConfigEntry, PaipCoordinator
 from .entity import PaipEntity

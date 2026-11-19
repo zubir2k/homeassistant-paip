@@ -10,7 +10,8 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
-from .api import AccountData, PaipAccountNotFound, PaipClient, PaipError
+from paip import AccountData, PaipAccountNotFound, PaipClient, PaipError
+
 from .const import CONF_ACCOUNT_NUMBER, CONF_NICKNAME, DEFAULT_SCAN_INTERVAL, DOMAIN
 from .statistics import async_import_bill_statistics
 
@@ -69,7 +70,9 @@ class PaipCoordinator(DataUpdateCoordinator[dict[str, AccountData]]):
                 errors.append(f"...{number[-4:]}: account not found")
                 if number not in self._failed_accounts:
                     self._failed_accounts.add(number)
-                    _LOGGER.warning("PAIP account ...%s returned no record", number[-4:])
+                    _LOGGER.warning(
+                        "PAIP account ...%s returned no record", number[-4:]
+                    )
             elif isinstance(result, PaipError):
                 errors.append(f"...{number[-4:]}: {result}")
                 if number not in self._failed_accounts:

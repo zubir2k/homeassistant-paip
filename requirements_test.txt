@@ -1,0 +1,3 @@
+pytest-homeassistant-custom-component
+python-paip==0.1.0
+reportlab>=4.0

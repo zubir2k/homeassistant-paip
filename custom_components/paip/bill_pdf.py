@@ -110,10 +110,10 @@ class _Page:
         for i in range(len(rows)):
             yy = top + hh + rh * i
             c.line(L, self.y(yy), R, self.y(yy))
-        for x, h in zip(cols, header):
+        for x, h in zip(cols, header, strict=False):
             self.txt(x + 4, top + 4, h, 9, True)
-        for i, row in enumerate(rows):
-            for x, v in zip(cols, row):
+        for row in rows:
+            for x, v in zip(cols, row, strict=False):
                 self.txt(x + 4, top + hh + 4, v, 9)
             top += rh
         return bottom
@@ -196,10 +196,18 @@ def render_bill(b: dict[str, Any], out: str | None = None) -> bytes:
         [L, 151.9, 285.9, 385.2],
         ["No Meter", "Tarikh", "Bacaan", "Penggunaan (m³)"],
         [
-            [text(b.get("NO_METER")), text(b.get("TARIKH_SEMASA")),
-             text(b.get("BACA_SEMASA")), text(b.get("PENGGUNAAN"))],
-            ["", text(b.get("TARIKH_DAHULU")),
-             text(b.get("BACA_DAHULU")), text(b.get("PENGGUNAAN_LAMA"))],
+            [
+                text(b.get("NO_METER")),
+                text(b.get("TARIKH_SEMASA")),
+                text(b.get("BACA_SEMASA")),
+                text(b.get("PENGGUNAAN")),
+            ],
+            [
+                "",
+                text(b.get("TARIKH_DAHULU")),
+                text(b.get("BACA_DAHULU")),
+                text(b.get("PENGGUNAAN_LAMA")),
+            ],
         ],
     )
     p.kv(bottom + 4, "Jumlah Penggunaan", text(b.get("JUMLAH_PENGGUNAAN")))
@@ -222,15 +230,18 @@ def render_bill(b: dict[str, Any], out: str | None = None) -> bytes:
     blocks = []
     n = 1
     while b.get(f"BLOK_{n}") is not None:
-        blocks.append([
-            text(b.get(f"BLOK_{n}")),
-            text(b.get(f"M3_{n}")),
-            text(b.get(f"KADAR_{n}")),
-            money(b.get(f"AMAUN_{n}")),
-        ])
+        blocks.append(
+            [
+                text(b.get(f"BLOK_{n}")),
+                text(b.get(f"M3_{n}")),
+                text(b.get(f"KADAR_{n}")),
+                money(b.get(f"AMAUN_{n}")),
+            ]
+        )
         n += 1
     bottom = p.table(
-        655.4, [L, 239.7, 355.6, 471.4],
+        655.4,
+        [L, 239.7, 355.6, 471.4],
         ["Blok Tarif (m³)", "Isipadu (m³)", "Kadar (RM)", "Amaun"],
         blocks or [["-", "-", "-", "-"]],
     )
@@ -263,5 +274,3 @@ def render_bill(b: dict[str, Any], out: str | None = None) -> bytes:
         with open(out, "wb") as fh:
             fh.write(data)
     return data
-
-

@@ -5,7 +5,8 @@ from __future__ import annotations
 from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .api import AccountData, payment_url
+from paip import AccountData, payment_url
+
 from .const import DOMAIN, MANUFACTURER, MODEL
 from .coordinator import PaipCoordinator
 
@@ -15,7 +16,9 @@ class PaipEntity(CoordinatorEntity[PaipCoordinator]):
 
     _attr_has_entity_name = True
 
-    def __init__(self, coordinator: PaipCoordinator, account_number: str, key: str) -> None:
+    def __init__(
+        self, coordinator: PaipCoordinator, account_number: str, key: str
+    ) -> None:
         super().__init__(coordinator)
         self._account_number = account_number
         self._attr_unique_id = f"{account_number}_{key}"
@@ -24,7 +27,9 @@ class PaipEntity(CoordinatorEntity[PaipCoordinator]):
             identifiers={(DOMAIN, account_number)},
             name=f"PAIP {coordinator.nickname(account_number)}",
             manufacturer=MANUFACTURER,
-            model=f"{MODEL} ({account.tariff_code})" if account and account.tariff_code else MODEL,
+            model=f"{MODEL} ({account.tariff_code})"
+            if account and account.tariff_code
+            else MODEL,
             serial_number=account_number,
             entry_type=DeviceEntryType.SERVICE,
             configuration_url=payment_url(account_number),

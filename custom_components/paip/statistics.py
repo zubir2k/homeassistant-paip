@@ -28,7 +28,8 @@ from homeassistant.const import UnitOfVolume
 from homeassistant.core import HomeAssistant
 from homeassistant.util import dt as dt_util
 
-from .api import AccountData, Bill
+from paip import AccountData, Bill
+
 from .const import CURRENCY_RM, DOMAIN, TIME_ZONE
 
 _LOGGER = logging.getLogger(__name__)
@@ -42,7 +43,9 @@ def spread_bills(bills: list[Bill]) -> list[tuple[date, float, float]]:
         key=lambda b: b.reading_date or b.bill_date,
     ):
         end = bill.reading_date or bill.bill_date
-        start = bill.previous_reading_date or (end - timedelta(days=bill.period_days or 30))
+        start = bill.previous_reading_date or (
+            end - timedelta(days=bill.period_days or 30)
+        )
         length = (end - start).days
         if length <= 0:
             continue
@@ -64,12 +67,18 @@ async def async_import_bill_statistics(
         return
     number = data.account_number
     await _import(
-        hass, f"{DOMAIN}:{number}_water", f"PAIP {label} water",
-        UnitOfVolume.CUBIC_METERS, [(d, u) for d, u, _ in days],
+        hass,
+        f"{DOMAIN}:{number}_water",
+        f"PAIP {label} water",
+        UnitOfVolume.CUBIC_METERS,
+        [(d, u) for d, u, _ in days],
     )
     await _import(
-        hass, f"{DOMAIN}:{number}_cost", f"PAIP {label} cost",
-        CURRENCY_RM, [(d, c) for d, _, c in days],
+        hass,
+        f"{DOMAIN}:{number}_cost",
+        f"PAIP {label} cost",
+        CURRENCY_RM,
+        [(d, c) for d, _, c in days],
     )
 
 
@@ -97,7 +106,9 @@ async def _import(
             continue
         last_ts = start.timestamp()
         total += value
-        stats.append(StatisticData(start=start, state=round(value, 4), sum=round(total, 4)))
+        stats.append(
+            StatisticData(start=start, state=round(value, 4), sum=round(total, 4))
+        )
     if not stats:
         return
 

@@ -21,7 +21,8 @@ from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.network import NoURLAvailableError, get_url
 from homeassistant.util import dt as dt_util
 
-from .api import normalise_account
+from paip import normalise_account
+
 from .const import (
     DEFAULT_LINK_HOURS,
     DOMAIN,
@@ -40,9 +41,9 @@ PDF_SCHEMA = vol.Schema(
     {
         vol.Required(PaipServiceArgument.ACCOUNT_NUMBER): cv.string,
         vol.Optional(PaipServiceArgument.BILL_NUMBER): cv.string,
-        vol.Optional(
-            PaipServiceArgument.EXPIRES, default=DEFAULT_LINK_HOURS
-        ): vol.All(vol.Coerce(int), vol.Range(min=1, max=MAX_LINK_HOURS)),
+        vol.Optional(PaipServiceArgument.EXPIRES, default=DEFAULT_LINK_HOURS): vol.All(
+            vol.Coerce(int), vol.Range(min=1, max=MAX_LINK_HOURS)
+        ),
     }
 )
 
