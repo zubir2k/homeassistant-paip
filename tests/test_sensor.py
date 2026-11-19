@@ -40,7 +40,7 @@ async def test_sensors(hass, mock_client):
     assert amount_due is not None
     assert amount_due.state == "12.0"
 
-    bill_amount = hass.states.get(prefix + "latest_bill_amount")
+    bill_amount = hass.states.get(prefix + "latest_bill")
     assert bill_amount is not None
     assert bill_amount.state == "22.25"
 
